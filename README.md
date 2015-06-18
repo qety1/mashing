@@ -5,7 +5,7 @@
 
 ### Download
 
-TODO
+[Version 1.0](https://github.com/qety1/mashing/releases/download/v1.0/ButtonMashing.zip)
 
 ### License
 
