@@ -1,8 +1,14 @@
 
-Button mashing test.
+#Button mashing
+
+TODO
+
+### Download
+
+TODO
 
 ### License
 
-Code : The MIT License (MIT)
+The MIT License (MIT)
 
-Font : Apache License Version 2.0
+Third-party OpenSans font is distributed under Apache License Version 2.0

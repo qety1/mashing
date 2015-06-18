@@ -16,7 +16,6 @@ const int cgap2 = cgap1 + 160;
 const int rgap0 = 10;
 const int rgap1 = rgap0 + 50;
 const int rgap = 50;
-const int cpos = 10;
 const int maxhist = 40*1000;
 
 const int nintevals = 7;
@@ -93,16 +92,16 @@ void drawdata(SDL_Renderer* renderer, TTF_Font* font,
     r.h = 2;
     r.y = rgap1;
     drawsep(renderer, &r);
-    drawtext(renderer, font, "Iterval", cgap0, rgap0);
+    drawtext(renderer, font, "Interval", cgap0, rgap0);
     drawtext(renderer, font, "Rate", cgap1, rgap0);
     drawtext(renderer, font, "Max", cgap2, rgap0);
     for(i = 0; i < nintevals; i++) {
         posy = i*rgap + rgap1;
         snprintf(buffer, bsz, "%d", intervals[i]/1000);
         drawtext(renderer, font, buffer, cgap0, posy);
-        snprintf(buffer, bsz, "%3.3lf", currentscores[i]);
+        snprintf(buffer, bsz, "%3.2lf", currentscores[i]);
         drawtext(renderer, font, buffer, cgap1, posy);
-        snprintf(buffer, bsz, "%3.3lf", topscores[i]);
+        snprintf(buffer, bsz, "%3.2lf", topscores[i]);
         drawtext(renderer, font, buffer, cgap2, posy);
         r.y = posy + rgap - adj;
         drawsep(renderer, &r);
@@ -112,7 +111,7 @@ void drawdata(SDL_Renderer* renderer, TTF_Font* font,
     int sec = (time / 1000) % 60;
     int msec = time % 1000;
     snprintf(buffer, bsz, "%02d:%02d.%02d", m, sec, msec/10);
-    drawtext(renderer, font, buffer, cpos, posy);
+    drawtext(renderer, font, buffer, cgap0, posy);
 }
 
 void draw(SDL_Renderer* renderer, TTF_Font* font,
@@ -149,7 +148,7 @@ int main(int argc, char* argv[]) {
     }
     
     SDL_Window *window;
-    window = SDL_CreateWindow("Button mashing test v0.1",
+    window = SDL_CreateWindow("Button mashing v0.1 by qety1",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               w, h, SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
