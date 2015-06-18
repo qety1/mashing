@@ -62,7 +62,8 @@ int count(deque<Uint32>& data, Uint32 tick, int offset) {
 }
 
 int updateresults(Uint32 tick, deque<Uint32>& data,
-                  double *currentscores, double *topscores) {
+                  double *currentscores, double *topscores,
+                  bool onlytop = true) {
     int times;
     double rate;
     for(int i = 0; i < nintevals; i++) {
@@ -71,7 +72,9 @@ int updateresults(Uint32 tick, deque<Uint32>& data,
         if(rate > topscores[i]) {
             topscores[i] = rate;
         }
-        currentscores[i] = rate;
+        if(!onlytop) {
+            currentscores[i] = rate;
+        }
     }
 }
 
@@ -82,7 +85,8 @@ void drawhist(SDL_Renderer* renderer, TTF_Font* font,
 }
 
 void drawdata(SDL_Renderer* renderer, TTF_Font* font,
-              double *currentscores, double *topscores, int time) {
+              double *currentscores, double *topscores,
+              int time) {
     const int adj = 2;
     const int bsz = 1024;
     static char buffer[bsz];
@@ -116,9 +120,12 @@ void drawdata(SDL_Renderer* renderer, TTF_Font* font,
 }
 
 void draw(SDL_Renderer* renderer, TTF_Font* font,
-          double *currentscores, double *topscores, int time) {
+          deque<Uint32>& data, Uint32 tick,
+          double *currentscores, double *topscores,
+          int time) {
     SDL_RenderClear(renderer);
     drawdata(renderer, font, currentscores, topscores, time);
+    drawhist(renderer, font, data, tick);
     SDL_RenderPresent(renderer);
 }
 
@@ -205,13 +212,16 @@ int main(int argc, char* argv[]) {
             }
         }
         if(tick > ticksaved + updaterate) {
-            updateresults(tick, data, currentscores, topscores);
+            updateresults(tick, data, currentscores, topscores, false);
             ticksaved = tick;
+        } else {
+            updateresults(tick, data, currentscores, topscores);
         }
         if(!hidden) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             if(joystick) {
-                draw(renderer, font, currentscores, topscores, tick-tickfirst);
+                draw(renderer, font, data, tick,
+                     currentscores, topscores, tick-tickfirst);
             } else {
                 drawpaderror(renderer, font);
             }
