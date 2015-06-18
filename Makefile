@@ -1,5 +1,5 @@
 
-FLAGS = -std=c++11 -g
+FLAGS = -std=c++11 -O2
 OBJS = mashing.cpp
 OBJ_NAME = mashing
 LINKER_FLAGS = -lSDL2 -lSDL2_ttf

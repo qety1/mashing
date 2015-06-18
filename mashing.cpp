@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
     SDL_JoystickID instanceid = SDL_JoystickInstanceID(joystick);
 
     SDL_Window *window;
-    window = SDL_CreateWindow("Button mashing v0.1 by qety1",
+    window = SDL_CreateWindow("Button mashing v1.0 by qety1",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
                               w, h, SDL_WINDOW_SHOWN);
