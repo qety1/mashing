@@ -1,4 +1,10 @@
 
+#ifdef __MINGW32__
+#define SDL_MAIN_HANDLED 1
+#endif
+
+#include <cstdio>
+#include <cstdlib>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
