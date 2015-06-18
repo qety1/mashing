@@ -16,6 +16,10 @@ const int cgap2 = cgap1 + 160;
 const int rgap0 = 10;
 const int rgap1 = rgap0 + 50;
 const int rgap = 50;
+const int hposx = 40;
+const int hposy = 520;
+const int hh = 5;
+const int hrpoy = 590;
 const int maxhist = 40*1000;
 
 const int nintevals = 7;
@@ -81,20 +85,32 @@ int updateresults(Uint32 tick, deque<Uint32>& data,
 
 void drawhist(SDL_Renderer* renderer, TTF_Font* font,
               deque<Uint32>& data, Uint32 tick) {
-    return;
+    const int linew = 4;
+    const int histw = 400;
+    const int histt = 1000;
+    int t, d;
+    SDL_Rect r = { hposx, hposy, linew, hh };
+    SDL_SetRenderDrawColor(renderer, 150, 255, 150, 255);
+    for(int i = 0; i < data.size(); i++) {
+        d = tick - data[i];
+        t = max(0, d);
+        if( t >= histt ) break;
+        r.x = hposx + t * histw / histt;
+        SDL_RenderFillRect(renderer, &r);
+    }
 }
 
 void drawdata(SDL_Renderer* renderer, TTF_Font* font,
               double *currentscores, double *topscores,
               int time) {
-    const int adj = 2;
+    const int seph = 2;
     const int bsz = 1024;
     static char buffer[bsz];
     int posy, i;
     SDL_Rect r;
     r.x = 0;
     r.w = w;
-    r.h = 2;
+    r.h = seph;
     r.y = rgap1;
     drawsep(renderer, &r);
     drawtext(renderer, font, "Interval", cgap0, rgap0);
@@ -108,7 +124,7 @@ void drawdata(SDL_Renderer* renderer, TTF_Font* font,
         drawtext(renderer, font, buffer, cgap1, posy);
         snprintf(buffer, bsz, "%3.2lf", topscores[i]);
         drawtext(renderer, font, buffer, cgap2, posy);
-        r.y = posy + rgap - adj;
+        r.y = posy + rgap - seph;
         drawsep(renderer, &r);
     }
     posy = i*rgap + rgap1;
@@ -117,6 +133,8 @@ void drawdata(SDL_Renderer* renderer, TTF_Font* font,
     int msec = time % 1000;
     snprintf(buffer, bsz, "%02d:%02d.%02d", m, sec, msec/10);
     drawtext(renderer, font, buffer, cgap0, posy);
+    snprintf(buffer, bsz, "%d", (int)currentscores[0]);
+    drawtext(renderer, font, buffer, cgap0, hrpoy);
 }
 
 void draw(SDL_Renderer* renderer, TTF_Font* font,
@@ -161,11 +179,13 @@ int main(int argc, char* argv[]) {
 
     SDL_Window *window;
     window = SDL_CreateWindow("Button mashing v0.1 by qety1",
-                              SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED,
                               w, h, SDL_WINDOW_SHOWN);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1,
+                                                SDL_RENDERER_ACCELERATED |
+                                                SDL_RENDERER_PRESENTVSYNC);
 
-    const int delay = 10;
     const int updaterate = 100;
     bool running = true;
     bool hidden = true;
@@ -177,7 +197,6 @@ int main(int argc, char* argv[]) {
     tickfirst = SDL_GetTicks();
     ticksaved = 0;
     while(running) {
-        tick = SDL_GetTicks();
         while(SDL_PollEvent(&event) > 0) {
             switch(event.type) {
             case SDL_WINDOWEVENT:
@@ -211,6 +230,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
         }
+        tick = SDL_GetTicks();
         if(tick > ticksaved + updaterate) {
             updateresults(tick, data, currentscores, topscores, false);
             ticksaved = tick;
@@ -226,7 +246,6 @@ int main(int argc, char* argv[]) {
                 drawpaderror(renderer, font);
             }
         }
-        SDL_Delay(delay);
     }
     SDL_DestroyWindow(window); 
     SDL_Quit(); 
