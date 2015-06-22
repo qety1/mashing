@@ -1,11 +1,13 @@
 
 #Button mashing
 
+Button mashing tester.
+
 ![alt tag](image.png)
 
 ### Download
 
-[Version 1.0](https://github.com/qety1/mashing/releases/download/v1.0/ButtonMashing.zip)
+[Version 1.1](https://github.com/qety1/mashing/releases/download/v1.1/ButtonMashing.zip)
 
 ### License
 

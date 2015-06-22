@@ -5,11 +5,11 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <string>
 #include <deque>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 using namespace std;
 
@@ -159,10 +159,25 @@ void drawpaderror(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_RenderPresent(renderer);
 }
 
-SDL_Joystick* getpad(int padnum) {
+void drawselbtn(SDL_Renderer* renderer, TTF_Font* font) {
+    SDL_RenderClear(renderer);
+    drawtext(renderer, font, "Press a button to mash...", cgap0, rgap0);
+    SDL_RenderPresent(renderer);
+}
+
+void getpad(int padnum, SDL_Joystick* &joystick, SDL_JoystickID& instanceid) {
     int npads = SDL_NumJoysticks();
-    if(npads <= 0) return NULL;
-    return SDL_JoystickOpen(padnum);
+    if(npads <= 0) return;
+    joystick = SDL_JoystickOpen(padnum);
+    if(joystick) {
+        instanceid = SDL_JoystickInstanceID(joystick);
+    }
+}
+
+void resetpad(SDL_Joystick* &joystick, SDL_JoystickID& instanceid) {
+    SDL_JoystickClose(joystick);
+    joystick = NULL;
+    instanceid = -1;
 }
 
 int main(int argc, char* argv[]) {
@@ -180,11 +195,12 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
-    SDL_Joystick *joystick = getpad(padnum);
-    SDL_JoystickID instanceid = SDL_JoystickInstanceID(joystick);
+    SDL_JoystickID instanceid = -1;
+    SDL_Joystick *joystick = NULL;
+    getpad(padnum, joystick, instanceid);
 
     SDL_Window *window;
-    window = SDL_CreateWindow("Button mashing v1.0 by qety1",
+    window = SDL_CreateWindow("Button mashing v1.1 by qety1",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
                               w, h, SDL_WINDOW_SHOWN);
@@ -193,9 +209,11 @@ int main(int argc, char* argv[]) {
                                                 SDL_RENDERER_PRESENTVSYNC);
 
     const int updaterate = 100;
+    const Uint32 nullbutton = 255;
     bool running = true;
     bool hidden = true;
     SDL_Event event;
+    Uint8 button = nullbutton;
     Uint32 tick, ticksaved, tickfirst;
     deque<Uint32> data;
     double topscores[nintevals] = { 0, 0, 0, 0, 0, 0, 0 };
@@ -216,19 +234,21 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case SDL_JOYBUTTONDOWN:
-                data.push_front(event.jbutton.timestamp);
+                if(button == nullbutton) {
+                    button = event.jbutton.button;
+                } else if(button == event.jbutton.button) {
+                    data.push_front(event.jbutton.timestamp);
+                }
                 break;
             case SDL_JOYDEVICEADDED:
                 if(!joystick) {
-                    joystick = getpad(padnum);
-                    instanceid = SDL_JoystickInstanceID(joystick);
+                    getpad(padnum, joystick, instanceid);
                 }
                 break;
             case SDL_JOYDEVICEREMOVED:
                 if(joystick && event.jdevice.which == instanceid) {
-                    SDL_JoystickClose(joystick);
-                    joystick = NULL;
-                    instanceid = -1;
+                    resetpad(joystick, instanceid);
+                    button = nullbutton;
                 }
                 break;
             case SDL_QUIT:
@@ -245,7 +265,9 @@ int main(int argc, char* argv[]) {
         }
         if(!hidden) {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            if(joystick) {
+            if(button == nullbutton && joystick) {
+                drawselbtn(renderer, font);
+            } else if(joystick) {
                 draw(renderer, font, data, tick,
                      currentscores, topscores, tick-tickfirst);
             } else {
@@ -253,6 +275,10 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+    resetpad(joystick, instanceid);
+    TTF_CloseFont(font);
+    TTF_Quit();
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window); 
     SDL_Quit(); 
     return 0;
