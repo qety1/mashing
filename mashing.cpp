@@ -273,6 +273,8 @@ int main(int argc, char* argv[]) {
             } else {
                 drawpaderror(renderer, font);
             }
+        } else {
+            SDL_Delay(updaterate);
         }
     }
     resetpad(joystick, instanceid);
