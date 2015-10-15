@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
     getpad(padnum, joystick, instanceid);
 
     SDL_Window *window;
-    window = SDL_CreateWindow("Button mashing v1.1 by qety1",
+    window = SDL_CreateWindow("Button mashing v1.2 by qety1",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
                               w, h, SDL_WINDOW_SHOWN);
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
                                                 SDL_RENDERER_PRESENTVSYNC);
 
     const int updaterate = 100;
-    const Uint32 nullbutton = 255;
+    const Uint8 nullbutton = 255;
     bool running = true;
     bool hidden = true;
     SDL_Event event;
@@ -235,6 +235,7 @@ int main(int argc, char* argv[]) {
                 break;
             case SDL_JOYBUTTONDOWN:
                 if(button == nullbutton) {
+                    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
                     button = event.jbutton.button;
                 } else if(button == event.jbutton.button) {
                     data.push_front(event.jbutton.timestamp);
@@ -243,6 +244,7 @@ int main(int argc, char* argv[]) {
             case SDL_JOYDEVICEADDED:
                 if(!joystick) {
                     getpad(padnum, joystick, instanceid);
+                    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
                 }
                 break;
             case SDL_JOYDEVICEREMOVED:

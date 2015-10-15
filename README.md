@@ -7,7 +7,7 @@ Button mashing tester.
 
 ### Download
 
-[Version 1.1](https://github.com/qety1/mashing/releases/download/v1.1/ButtonMashing.zip)
+[Version 1.2](https://github.com/qety1/mashing/releases/download/v1.2/ButtonMashing.zip)
 
 ### License
 
